@@ -1,0 +1,40 @@
+# Android Studio
+.idea/
+*.iml
+
+# Build output
+/build/
+/app/build/
+
+# Gradle
+.gradle/
+/gradlew*
+/gradle-wrapper.jar
+/gradle-wrapper.properties
+
+# Local configuration file (SDK path, signing keys…)
+local.properties
+
+# Kotlin DSL caches
+/*.kotlin_module
+
+# Log files
+*.log
+
+# Android generated files
+captures/
+/output.json
+
+# IntelliJ
+*.ipr
+*.iws
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Kotlin
+*.class
+
+# Misc
+*.keystore
