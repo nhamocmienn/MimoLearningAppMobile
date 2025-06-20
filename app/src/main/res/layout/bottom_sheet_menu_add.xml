@@ -4,6 +4,8 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp"
+    android:background="?attr/colorSurface"
+    android:textColor="?attr/colorOnSurface"
     >
 
     <!-- Indicator handle -->

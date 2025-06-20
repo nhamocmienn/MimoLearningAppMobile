@@ -3,7 +3,10 @@
     android:id="@+id/addClassRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface"
+    android:textColor="?attr/colorOnSurface"
+    >
 
     <!-- Top Bar -->
     <LinearLayout
