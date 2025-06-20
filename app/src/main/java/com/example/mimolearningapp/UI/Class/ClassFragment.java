@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mimolearningapp.ActionSystem.LoadingDialog;
 import com.example.mimolearningapp.Adapter.ClassAdapter;
 import com.example.mimolearningapp.Data.Online.ApiClient;
 import com.example.mimolearningapp.Data.Online.ClassApiService;
@@ -47,11 +48,15 @@ public class ClassFragment extends Fragment {
     }
 
     private void loadClasses() {
+        LoadingDialog loadingDialog = new LoadingDialog(requireContext());
+        loadingDialog.show();
+
         ClassApiService apiService = ApiClient.getClassApiService();
         apiService.getAllClasses().enqueue(new Callback<List<ClassItem>>() {
             @Override
             public void onResponse(@NonNull Call<List<ClassItem>> call,
                                    @NonNull Response<List<ClassItem>> response) {
+                loadingDialog.dismiss();
                 if (response.isSuccessful() && response.body() != null) {
                     adapter = new ClassAdapter(response.body());
                     recyclerView.setAdapter(adapter);
@@ -62,6 +67,7 @@ public class ClassFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<List<ClassItem>> call, @NonNull Throwable t) {
+                loadingDialog.dismiss();
                 Toast.makeText(getContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });

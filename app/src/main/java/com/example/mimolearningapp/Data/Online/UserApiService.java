@@ -15,4 +15,6 @@ public interface UserApiService {
     @POST("api/User/update")
     Call<LoginResponse> updateProfile(@Body UpdateProfileRequest request);
 
+    @POST("api/User/delete")
+    Call<Void> deleteAccount(@Body LoginRequest request);
 }

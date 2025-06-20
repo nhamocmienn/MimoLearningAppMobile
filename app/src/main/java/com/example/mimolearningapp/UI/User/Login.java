@@ -13,6 +13,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.mimolearningapp.ActionSystem.LoadingDialog;
 import com.example.mimolearningapp.Data.Offline.UserLocalService;
 import com.example.mimolearningapp.Data.Online.ApiClient;
 import com.example.mimolearningapp.Data.Online.UserApiService;
@@ -76,9 +77,14 @@ public class Login extends AppCompatActivity {
         UserApiService api = ApiClient.getUserApiService();
         LoginRequest request = new LoginRequest(email, password);
 
+        LoadingDialog loadingDialog = new LoadingDialog(Login.this);
+        loadingDialog.show();
+
+
         api.login(request).enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                loadingDialog.dismiss();
                 if (response.isSuccessful() && response.body() != null) {
                     // Lưu user vào SQLite bằng module riêng
                     UserLocalService localService = new UserLocalService(Login.this);
@@ -94,6 +100,7 @@ public class Login extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
+                loadingDialog.dismiss();
                 Toast.makeText(Login.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

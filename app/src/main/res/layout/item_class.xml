@@ -1,5 +1,6 @@
 <!-- item_class.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -8,17 +9,38 @@
     android:textColor="?attr/colorOnSurface"
     >
 
-    <TextView
-        android:id="@+id/tvClassName"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Class Name"
-        android:textStyle="bold"
-        android:textSize="16sp"/>
+        android:layout_height="156dp"
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/tvCreatorId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Creator ID"/>
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="73dp"
+            android:layout_height="39dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/ic_class" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvClassName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Class Name"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvCreatorId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Creator ID" />
+        </LinearLayout>
+
+    </LinearLayout>
+
 </LinearLayout>
