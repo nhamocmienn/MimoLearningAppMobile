@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +29,7 @@ public class ManageProfile extends AppCompatActivity {
 
     ImageView imgAvatar;
     TextView tvName, tvRole;
-    EditText edtEmail, edtPassword;
+    TextView tvEmail;
     Button btnUpdate;
     Button btnLogout, btnDeleteAccount;
 
@@ -45,12 +46,11 @@ public class ManageProfile extends AppCompatActivity {
         imgAvatar = findViewById(R.id.imgAvatar);
         tvName = findViewById(R.id.tvName);
         tvRole = findViewById(R.id.tvRole);
-        edtEmail = findViewById(R.id.edtEmail);
-        edtPassword = findViewById(R.id.edtPassword);
+        tvEmail = findViewById(R.id.tvEmail);
         btnUpdate = findViewById(R.id.btnUpdate);
 
         btnLogout = findViewById(R.id.btnLogout);
-        btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
+        //btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
 
 
         // Khởi tạo service
@@ -63,8 +63,9 @@ public class ManageProfile extends AppCompatActivity {
         if (currentUser != null) {
             tvName.setText(currentUser.getName());
             tvRole.setText(currentUser.getRole());
-            edtEmail.setText(currentUser.getEmail());
-        } else {
+            tvEmail.setText(currentUser.getEmail());
+        }
+        else {
             Toast.makeText(this, "Không tìm thấy thông tin người dùng!", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -80,68 +81,129 @@ public class ManageProfile extends AppCompatActivity {
             finish();
         });
 
-        //xoa
-        btnDeleteAccount.setOnClickListener(v -> {
-            apiService.deleteAccount(new LoginRequest(currentUser.getEmail(), currentUser.getRole())) // hoặc request ID
-                    .enqueue(new Callback<Void>() {
+//        btnDeleteAccount.setOnClickListener(v -> {
+//            // Tạo dialog nhập mật khẩu xác nhận
+//            final EditText edtPassword = new EditText(this);
+//            edtPassword.setHint("Nhập mật khẩu để xác nhận");
+//            edtPassword.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//            int padding = (int) (16 * getResources().getDisplayMetrics().density);
+//            edtPassword.setPadding(padding, padding, padding, padding);
+//
+//            new android.app.AlertDialog.Builder(this)
+//                    .setTitle("Xóa tài khoản")
+//                    .setMessage("Bạn có chắc muốn xóa tài khoản này? Hành động này không thể hoàn tác.")
+//                    .setView(edtPassword)
+//                    .setPositiveButton("Xác nhận", (dialog, which) -> {
+//                        String password = edtPassword.getText().toString().trim();
+//                        if (TextUtils.isEmpty(password)) {
+//                            Toast.makeText(this, "Vui lòng nhập mật khẩu", Toast.LENGTH_SHORT).show();
+//                            return;
+//                        }
+//
+//                        LoadingDialog loadingDialog = new LoadingDialog(this);
+//                        loadingDialog.show();
+//
+//                        LoginRequest request = new LoginRequest(currentUser.getEmail(), password);
+//                        apiService.deleteAccount(request).enqueue(new Callback<Void>() {
+//                            @Override
+//                            public void onResponse(Call<Void> call, Response<Void> response) {
+//                                loadingDialog.dismiss();
+//                                if (response.isSuccessful()) {
+//                                    userLocalService.clearUser();
+//                                    Toast.makeText(ManageProfile.this, "Đã xóa tài khoản", Toast.LENGTH_SHORT).show();
+//                                    startActivity(new Intent(ManageProfile.this, Login.class));
+//                                    finish();
+//                                } else {
+//                                    Toast.makeText(ManageProfile.this, "Mật khẩu không đúng hoặc lỗi khi xóa", Toast.LENGTH_SHORT).show();
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Call<Void> call, Throwable t) {
+//                                loadingDialog.dismiss();
+//                                Toast.makeText(ManageProfile.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                    })
+//                    .setNegativeButton("Hủy", null)
+//                    .show();
+//        });
+    }
+
+    private void updateProfile() {
+        // Tạo layout custom cho dialog
+        final EditText edtName = new EditText(this);
+        edtName.setHint("Tên");
+
+        final EditText edtEmail = new EditText(this);
+        edtEmail.setHint("Email");
+
+        final EditText edtPassword = new EditText(this);
+        edtPassword.setHint("Mật khẩu");
+        edtPassword.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+        final EditText edtConfirmPassword = new EditText(this);
+        edtConfirmPassword.setHint("Xác nhận mật khẩu");
+        edtConfirmPassword.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+        layout.setPadding(padding, padding, padding, padding);
+        layout.addView(edtName);
+        layout.addView(edtEmail);
+        layout.addView(edtPassword);
+        layout.addView(edtConfirmPassword);
+
+        edtName.setText(currentUser.getName());
+        edtEmail.setText(currentUser.getEmail());
+
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Cập nhật thông tin")
+                .setView(layout)
+                .setPositiveButton("Xác nhận", (dialog, which) -> {
+                    String name = edtName.getText().toString().trim();
+                    String email = edtEmail.getText().toString().trim();
+                    String password = edtPassword.getText().toString().trim();
+                    String confirmPassword = edtConfirmPassword.getText().toString().trim();
+
+                    if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(name)) {
+                        Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (!password.equals(confirmPassword)) {
+                        Toast.makeText(this, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    LoadingDialog loadingDialog = new LoadingDialog(this);
+                    loadingDialog.show();
+
+                    UpdateProfileRequest request = new UpdateProfileRequest(currentUser.getUserId(), email, password);
+                    apiService.updateProfile(request).enqueue(new Callback<LoginResponse>() {
                         @Override
-                        public void onResponse(Call<Void> call, Response<Void> response) {
-                            if (response.isSuccessful()) {
-                                userLocalService.clearUser();
-                                Toast.makeText(ManageProfile.this, "Đã xóa tài khoản", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(ManageProfile.this, Login.class));
-                                finish();
+                        public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                            loadingDialog.dismiss();
+                            if (response.isSuccessful() && response.body() != null) {
+                                userLocalService.saveUser(response.body());
+                                tvName.setText(response.body().getName());
+                                tvRole.setText(response.body().getRole());
+                                tvEmail.setText(response.body().getEmail());
+                                Toast.makeText(ManageProfile.this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(ManageProfile.this, "Xóa thất bại", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ManageProfile.this, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
                             }
                         }
 
                         @Override
-                        public void onFailure(Call<Void> call, Throwable t) {
+                        public void onFailure(Call<LoginResponse> call, Throwable t) {
+                            loadingDialog.dismiss();
                             Toast.makeText(ManageProfile.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
-        });
-
-
-    }
-
-    private void updateProfile() {
-        String email = edtEmail.getText().toString().trim();
-        String password = edtPassword.getText().toString().trim();
-
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Vui lòng nhập email và mật khẩu", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        LoadingDialog loadingDialog = new LoadingDialog(this);
-        loadingDialog.show();
-
-        UpdateProfileRequest request = new UpdateProfileRequest(currentUser.getUserId(), email, password);
-        apiService.updateProfile(request).enqueue(new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                loadingDialog.dismiss();
-                if (response.isSuccessful() && response.body() != null) {
-                    // Lưu lại vào SQLite
-                    userLocalService.saveUser(response.body());
-
-                    // Hiển thị lại nếu cần
-                    tvName.setText(response.body().getName());
-                    tvRole.setText(response.body().getRole());
-
-                    Toast.makeText(ManageProfile.this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(ManageProfile.this, "Lỗi cập nhật. Vui lòng thử lại", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                loadingDialog.dismiss();
-                Toast.makeText(ManageProfile.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 }
